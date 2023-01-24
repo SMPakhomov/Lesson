@@ -49,10 +49,8 @@ class Input(QWidget):
         self.bt_obj.clicked.connect(self.obj)
         self.bt_obj.move(220, 340)
 
-        self.map_center = None
-
     def obj(self):
-        object = self.obj_ln
+        object = self.obj_ln.text()
         params = {
             "l": "map",
             "text": object
@@ -61,7 +59,6 @@ class Input(QWidget):
 
     def place(self):  # поиск места по коорд
         ll = self.line_ed_l1.text(), self.line_ed_l2.text()
-        self.map_center = ll
         z = self.s.text()
 
         params = {
@@ -77,16 +74,18 @@ class Input(QWidget):
         search_params = {
             "apikey": api_key,
             "text": obj,
-            "lang": "ru_RU"
+            "lang": "ru_RU",
         }
         response = requests.get(search_api_server, search_params).json()
         object = response["features"][0]
         coords = object["geometry"]["coordinates"]
         params = {
             "l": "map",
-            "ll": ','.join(coords),
-            "pt": f"{','.join(coords)}, pmal"
+            "ll": ','.join(map(str, coords)),
+            "pt": f"{','.join(map(str, coords))},pmgnl",
+            "z": '17'
         }
+        self.draw(params)
 
     def draw(self, params):  # рисовка карты по переданным параметрам
         map_file = "map.png"

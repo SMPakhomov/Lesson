@@ -99,14 +99,32 @@ class Input(QWidget):
                     running = False
                 if event.type == pygame.KEYDOWN:
                     spn_delt = 0
+                    coor_delt_height = 0
+                    coor_delt_weist = 0
                     if event.key == pygame.K_PAGEUP: # изм. масштаба
                         spn_delt = 1
                     if event.key == pygame.K_PAGEDOWN: # изм. масштаба
                         spn_delt = -1
+                    if event.key == pygame.K_UP:  # -90...90
+
+                        coor_delt_weist = 1
+                    if event.key == pygame.K_DOWN:
+                        coor_delt_weist = -1
+                    if event.key == pygame.K_RIGHT:  # -180... 180
+                        coor_delt_height = 1
+                    if event.key == pygame.K_LEFT:
+                        coor_delt_height = -1
                     spn = float(params["spn"].split(',')[0]) + spn_delt
                     spn = max(0, spn)
                     spn = min(50, spn)
                     params["spn"] = ','.join([str(spn), str(spn)])
+                    coor_height = float(params["ll"].split(',')[0]) + coor_delt_height
+                    coor_height = max(-175.0 + spn, coor_height)
+                    coor_height = min(175.0 - spn, coor_height)
+                    coor_weist = float(params["ll"].split(',')[1]) + coor_delt_weist
+                    coor_weist = max(-85.0 + spn, coor_weist)
+                    coor_weist = min(85.0 - spn, coor_weist)
+                    params["ll"] = ','.join([str(coor_height), str(coor_weist)])
 
             api_server = "http://static-maps.yandex.ru/1.x/"
             response = requests.get(api_server, params=params)

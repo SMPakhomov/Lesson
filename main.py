@@ -59,19 +59,19 @@ class Input(QWidget):
         }
         self.search_obj(object)
 
-    def place(self): # поиск места по коорд
+    def place(self):  # поиск места по коорд
         ll = self.line_ed_l1.text(), self.line_ed_l2.text()
         self.map_center = ll
-        spn = self.s.text()
+        z = self.s.text()
 
         params = {
             "ll": ",".join([ll[0], ll[1]]),
-            "spn": ",".join([spn, spn]),
+            "z": z,
             "l": "map"
         }
         self.draw(params)
 
-    def search_obj(self, obj): # поиск объекта
+    def search_obj(self, obj):  # поиск объекта
         search_api_server = "https://search-maps.yandex.ru/v1/"
         api_key = "dda3ddba-c9ea-4ead-9010-f43fbc15c6e3"
         search_params = {
@@ -88,7 +88,7 @@ class Input(QWidget):
             "pt": f"{','.join(coords)}, pmal"
         }
 
-    def draw(self, params): # рисовка карты по переданным параметрам
+    def draw(self, params):  # рисовка карты по переданным параметрам
         map_file = "map.png"
         pygame.init()
         screen = pygame.display.set_mode((600, 450))
@@ -98,15 +98,15 @@ class Input(QWidget):
                 if event.type == pygame.QUIT:
                     running = False
                 if event.type == pygame.KEYDOWN:
-                    spn_delt = 0
-                    if event.key == pygame.K_PAGEUP: # изм. масштаба
-                        spn_delt = 1
-                    if event.key == pygame.K_PAGEDOWN: # изм. масштаба
-                        spn_delt = -1
-                    spn = float(params["spn"].split(',')[0]) + spn_delt
-                    spn = max(0, spn)
-                    spn = min(50, spn)
-                    params["spn"] = ','.join([str(spn), str(spn)])
+                    z_delt = 0
+                    if event.key == pygame.K_PAGEUP:  # изм. масштаба
+                        z_delt = 1
+                    if event.key == pygame.K_PAGEDOWN:  # изм. масштаба
+                        z_delt = -1
+                    z = int(params["z"]) + z_delt
+                    z = max(0, z)
+                    z = min(17, z)
+                    params["z"] = str(z)
 
             api_server = "http://static-maps.yandex.ru/1.x/"
             response = requests.get(api_server, params=params)
@@ -121,9 +121,10 @@ class Input(QWidget):
 
         os.remove(map_file)
 
+
 app = QApplication(sys.argv)
 ex = Input()
 ex.show()
 sys.exit(app.exec())
 
-# пример ввода ll - 37.530887 55.703118 | spn - 0.002
+# пример ввода ll - 37.530887 55.703118 | z - 5

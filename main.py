@@ -36,7 +36,7 @@ class Input(QWidget):
         self.bt.clicked.connect(self.map)
         self.bt.move(240, 140)
 
-    def map(self):
+    def my_map(self):
         ll = self.line_ed_l1.text(), self.line_ed_l2.text()
         spn = self.s.text()
         api_server = "http://static-maps.yandex.ru/1.x/"
@@ -56,8 +56,48 @@ class Input(QWidget):
         screen = pygame.display.set_mode((600, 450))
         screen.blit(pygame.image.load(map_file), (0, 0))
         pygame.display.flip()
-        while pygame.event.wait().type != pygame.QUIT:
-            pass
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_PAGEUP:
+                        self.spn = str(float(self.spn) + 0.002)
+                        if self.spn == '0.016':
+                            self.spn = '0.002'
+                        params = {
+                            "ll": ",".join([self.ll[0], self.ll[1]]),
+                            "spn": ",".join([self.spn, self.spn]),
+                            "l": "map"
+                        }
+
+                        response = requests.get(api_server, params=params)
+
+                        map_file = "map.png"
+                        with open(map_file, "wb") as file:
+                            file.write(response.content)
+                        screen.blit(pygame.image.load(map_file), (0, 0))
+                        pygame.display.flip()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_PAGEDOWN:
+                        self.spn = str(float(self.spn) - 0.002)
+                        if self.spn == '0.0':
+                            self.spn = '0.002'
+                        params = {
+                            "ll": ",".join([self.ll[0], self.ll[1]]),
+                            "spn": ",".join([self.spn, self.spn]),
+                            "l": "map"
+                        }
+
+                        response = requests.get(api_server, params=params)
+
+                        map_file = "map.png"
+                        with open(map_file, "wb") as file:
+                            file.write(response.content)
+                        screen.blit(pygame.image.load(map_file), (0, 0))
+                        pygame.display.flip()
+
         pygame.quit()
 
         os.remove(map_file)
